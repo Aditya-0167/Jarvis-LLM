@@ -1,0 +1,93 @@
+{
+  "seed": 1701,
+  "runtime": {
+    "host": "127.0.0.1",
+    "port": 8765,
+    "train_every_seconds": 15,
+    "checkpoint_every_cycles": 1
+  },
+  "paths": {
+    "data": "data",
+    "checkpoints": "checkpoints",
+    "generations": "generations",
+    "workspace": "workspace",
+    "sandbox": "sandbox"
+  },
+  "training": {
+    "batch_size": 4,
+    "block_size": 384,
+    "learning_rate": 0.00045,
+    "weight_decay": 0.01,
+    "grad_clip": 1.0,
+    "steps_per_cycle": 10,
+    "eval_batches": 6,
+    "curriculum_mix": 0.2,
+    "amp": true,
+    "web_followup_steps": 4,
+    "warmup_steps": 20,
+    "lr_warmup_steps": 10
+  },
+  "models": {
+    "local": {
+      "vocab_size": 256,
+      "d_model": 192,
+      "n_heads": 6,
+      "n_layers": 6,
+      "experts": 2,
+      "top_k_experts": 2,
+      "dropout": 0.05,
+      "block_size": 384
+    },
+    "colab": {
+      "vocab_size": 256,
+      "d_model": 384,
+      "n_heads": 8,
+      "n_layers": 12,
+      "experts": 6,
+      "top_k_experts": 2,
+      "dropout": 0.05,
+      "block_size": 768
+    },
+    "cloud": {
+      "vocab_size": 256,
+      "d_model": 512,
+      "n_heads": 8,
+      "n_layers": 16,
+      "experts": 6,
+      "top_k_experts": 2,
+      "dropout": 0.05,
+      "block_size": 1024
+    }
+  },
+  "evolution": {
+    "architecture_candidates": 2,
+    "architecture_steps": 6,
+    "accept_margin": 0.002,
+    "width_step": 64,
+    "max_layers_local": 10,
+    "max_layers_colab": 18,
+    "max_layers_cloud": 32,
+    "max_experts": 12,
+    "max_d_model": 768,
+    "max_block_size": 1536,
+    "steps_by_profile": {
+      "local": 1,
+      "colab": 40,
+      "cloud": 100
+    }
+  },
+  "retrieval": {
+    "chunk_chars": 1800
+  },
+  "web": {
+    "timeout": 20,
+    "crawl_delay_seconds": 1.0,
+    "max_chars": 100000,
+    "max_depth": 2,
+    "seed_urls": [
+      "https://en.wikipedia.org/wiki/Artificial_intelligence",
+      "https://www.python.org/doc/",
+      "https://pytorch.org/docs/stable/"
+    ]
+  }
+}
