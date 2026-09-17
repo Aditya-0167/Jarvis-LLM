@@ -1,3 +1,13 @@
+## Current Research State
+
+**Generation:** 10  
+**Parameters:** 156,144,084  
+**Training steps:** 3,520  
+**Checkpoint:** Generation 10  
+**Artifact:** JARVIS_GENERATION_10_BACKUP.zip
+
+[Download Gen-10 Checkpoint](https://github.com/Aditya-0167/jarvis-the-future/releases/latest/download/JARVIS_GENERATION_10_BACKUP.zip)
+
 # JARVIS V6 — From-Scratch Continual-Learning Research AI
 
 JARVIS V6 is a research system for training and evolving a small neural language model from random initialization. It combines a byte-level causal transformer, persistent data and memory, public-web ingestion, evaluation, architecture search, model scaling, checkpoint lineage, and interactive chat.
