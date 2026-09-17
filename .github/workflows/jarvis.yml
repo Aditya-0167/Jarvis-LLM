@@ -1,0 +1,53 @@
+name: JARVIS V6 bounded research run
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Restore workspace/checkpoints cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            data
+            checkpoints
+            generations
+            workspace
+          key: jarvis-v6-${{ github.ref_name }}-${{ github.run_number }}
+          restore-keys: |
+            jarvis-v6-${{ github.ref_name }}-
+      - name: Run bounded autonomous development
+        run: python main.py autonomous --cycles 12
+      - name: Generate report
+        run: python main.py report
+      - name: Build portable learned-state bundle
+        run: |
+          mkdir -p artifacts
+          python main.py bundle --destination artifacts/jarvis_v6_state
+          echo "Checkpoint files:" 
+          find checkpoints -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
+      - name: Upload logs, metrics, and learned model checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-v6-run-${{ github.run_number }}
+          retention-days: 30
+          path: |
+            artifacts/jarvis_v6_state.zip
+            workspace
+            generations
+            checkpoints/*.pt
+            checkpoints/LATEST.json
+          if-no-files-found: error
