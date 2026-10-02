@@ -2,8 +2,10 @@ name: JARVIS V6 bounded research run
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 */6 * * *"
+
+concurrency:
+  group: jarvis-bounded-research
+  cancel-in-progress: false
 
 jobs:
   run:
