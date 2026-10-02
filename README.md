@@ -46,6 +46,10 @@ GEN
 Artifact: JARVIS_GENERATION_10_BACKUP.zip
 
 https://github.com/Aditya-0167/Jarvis-LLM/releases/tag/gen10
+
+workflow:
+https://github.com/Aditya-0167/Jarvis-LLM/actions
+
 ---
 
 # What I built
