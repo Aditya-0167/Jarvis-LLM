@@ -41,7 +41,11 @@ block size      = 1280
 ```
 
 These values describe one experimental trajectory; they are not intended as normalized comparisons with unrelated models.
+GEN
 
+Artifact: JARVIS_GENERATION_10_BACKUP.zip
+
+https://github.com/Aditya-0167/Jarvis-LLM/releases/tag/gen10
 ---
 
 # What I built
