@@ -1,55 +1,254 @@
-name: JARVIS V6 bounded research run
+name: JARVIS Continuous Research Loop
 
 on:
   workflow_dispatch:
 
+  # Continuous operation:
+  # one bounded research run every 30 minutes.
+  schedule:
+    - cron: "*/30 * * * *"
+
 concurrency:
-  group: jarvis-bounded-research
+  # Unique to this workflow + branch.
+  # Never cancel a running JARVIS experiment.
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
+  queue: max
+
+permissions:
+  contents: read
 
 jobs:
   run:
-    runs-on: ubuntu-latest
-    timeout-minutes: 350
-    permissions:
-      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      # ======================================================
+      # CHECKOUT
+      # ======================================================
+
+      - name: Checkout JARVIS
+        uses: actions/checkout@v7
+
+      # ======================================================
+      # PYTHON
+      # ======================================================
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+
+      # ======================================================
+      # DEPENDENCIES
+      # ======================================================
+
       - name: Install dependencies
-        run: python -m pip install -r requirements.txt
-      - name: Restore workspace/checkpoints cache
-        uses: actions/cache@v4
+        run: |
+          python -m pip install --upgrade pip
+
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      # ======================================================
+      # RESTORE PERSISTENT JARVIS STATE
+      # ======================================================
+
+      - name: Restore JARVIS learned state
+        id: jarvis-cache
+        uses: actions/cache@v6
         with:
           path: |
             data
             checkpoints
             generations
             workspace
-          key: jarvis-v6-${{ github.ref_name }}-${{ github.run_number }}
+          key: jarvis-continuous-${{ github.ref_name }}-${{ github.run_number }}
           restore-keys: |
-            jarvis-v6-${{ github.ref_name }}-
-      - name: Run bounded autonomous development
-        run: python main.py autonomous --cycles 12
-      - name: Generate report
-        run: python main.py report
-      - name: Build portable learned-state bundle
+            jarvis-continuous-${{ github.ref_name }}-
+
+      # ======================================================
+      # SHOW EXACT STATE BEFORE RUN
+      # ======================================================
+
+      - name: Inspect current JARVIS state
         run: |
           mkdir -p artifacts
-          python main.py bundle --destination artifacts/jarvis_v6_state
-          echo "Checkpoint files:" 
-          find checkpoints -maxdepth 1 -type f -printf '%f %s bytes\n' | sort
-      - name: Upload logs, metrics, and learned model checkpoint
+
+          echo "=================================================="
+          echo "JARVIS STATE BEFORE AUTONOMOUS LOOP"
+          echo "=================================================="
+
+          python main.py status \
+            | tee artifacts/status_before.txt \
+            || true
+
+          echo
+          echo "CHECKPOINT FILES"
+          find checkpoints \
+            -maxdepth 1 \
+            -type f \
+            -name 'generation_*.pt' \
+            -printf '%f %s bytes\n' \
+            | sort \
+            | tee artifacts/checkpoints_before.txt \
+            || true
+
+      # ======================================================
+      # RESILIENT AUTONOMOUS LOOP
+      #
+      # IMPORTANT:
+      # We run ONE cycle per Python process instead of asking
+      # one process to own all 12 cycles.
+      #
+      # If one cycle returns an error, the remaining cycles
+      # continue.
+      # ======================================================
+
+      - name: Run resilient autonomous research loop
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+
+          mkdir -p artifacts/autonomous_logs
+
+          TOTAL_CYCLES=12
+          SUCCESSFUL=0
+          FAILED=0
+
+          echo "=================================================="
+          echo "JARVIS CONTINUOUS AUTONOMOUS RESEARCH"
+          echo "TOTAL CYCLES: ${TOTAL_CYCLES}"
+          echo "=================================================="
+
+          for CYCLE in $(seq 1 ${TOTAL_CYCLES}); do
+
+            echo
+            echo "=================================================="
+            echo "JARVIS CYCLE ${CYCLE}/${TOTAL_CYCLES}"
+            echo "=================================================="
+
+            LOG="artifacts/autonomous_logs/cycle_${CYCLE}.log"
+
+            timeout --signal=TERM --kill-after=30s 20m \
+              python main.py autonomous --cycles 1 \
+              2>&1 \
+              | tee "${LOG}"
+
+            RC=${PIPESTATUS[0]}
+
+            echo "cycle=${CYCLE}" >> "${LOG}"
+            echo "return_code=${RC}" >> "${LOG}"
+
+            if [ "${RC}" -eq 0 ]; then
+              SUCCESSFUL=$((SUCCESSFUL + 1))
+              echo "✅ Cycle ${CYCLE} completed"
+            else
+              FAILED=$((FAILED + 1))
+              echo "⚠️ Cycle ${CYCLE} returned ${RC}"
+              echo "Continuing to next cycle..."
+            fi
+
+            # Snapshot state after EVERY cycle.
+            python main.py status \
+              > "artifacts/autonomous_logs/status_after_cycle_${CYCLE}.txt" \
+              2>&1 \
+              || true
+
+            sleep 3
+          done
+
+          echo
+          echo "=================================================="
+          echo "JARVIS LOOP FINISHED"
+          echo "=================================================="
+          echo "successful_cycles=${SUCCESSFUL}"
+          echo "failed_cycles=${FAILED}"
+          echo "total_cycles=${TOTAL_CYCLES}"
+          echo "=================================================="
+
+          cat > artifacts/autonomous_summary.txt <<EOF
+          JARVIS Continuous Research Run
+
+          Total cycles: ${TOTAL_CYCLES}
+          Successful cycles: ${SUCCESSFUL}
+          Failed cycles: ${FAILED}
+
+          The workflow intentionally records individual
+          cycle failures without terminating the complete
+          research block.
+          EOF
+
+          # Keep the GitHub orchestration job alive so the
+          # reports and state can be archived.
+          exit 0
+
+      # ======================================================
+      # FINAL STATUS
+      # ======================================================
+
+      - name: Generate final JARVIS report
+        if: always()
+        run: |
+          mkdir -p artifacts
+
+          python main.py status \
+            > artifacts/status_after.txt \
+            2>&1 \
+            || true
+
+          python main.py benchmark \
+            > artifacts/benchmark.txt \
+            2>&1 \
+            || true
+
+          echo "GitHub run: $GITHUB_RUN_NUMBER" \
+            > artifacts/run_metadata.txt
+
+          echo "Commit: $GITHUB_SHA" \
+            >> artifacts/run_metadata.txt
+
+          echo "Date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            >> artifacts/run_metadata.txt
+
+      # ======================================================
+      # SAVE RESEARCH ARTIFACTS
+      # ======================================================
+
+      - name: Upload JARVIS research logs
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: jarvis-v6-run-${{ github.run_number }}
-          retention-days: 30
+          name: jarvis-research-run-${{ github.run_number }}
           path: |
-            artifacts/jarvis_v6_state.zip
-            workspace
-            generations
-            checkpoints/*.pt
-            checkpoints/LATEST.json
-          if-no-files-found: error
+            artifacts/
+          if-no-files-found: warn
+          retention-days: 30
+
+      # ======================================================
+      # FINAL CHECKPOINT INVENTORY
+      # ======================================================
+
+      - name: Final checkpoint inventory
+        if: always()
+        run: |
+          echo "=================================================="
+          echo "FINAL CHECKPOINTS"
+          echo "=================================================="
+
+          find checkpoints \
+            -maxdepth 1 \
+            -type f \
+            -name 'generation_*.pt' \
+            -printf '%f %s bytes\n' \
+            | sort \
+            || true
+
+          echo
+          echo "=================================================="
+          echo "JARVIS CONTINUOUS RUN COMPLETE"
+          echo "=================================================="
