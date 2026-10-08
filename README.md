@@ -1792,3 +1792,8 @@ See the manuscript for full bibliographic entries.
 Independent research in artificial intelligence, machine learning, language models, continual learning, AI systems, and AI security.
 
 ---
+## Copyright
+
+© 2026 Aditya. All rights reserved.
+
+No permission is granted to copy, modify, distribute, reproduce, or commercially use this code or substantial portions of this repository without prior written permission.
