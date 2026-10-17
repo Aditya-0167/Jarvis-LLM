@@ -1,3 +1,8 @@
+# ** CRITICAL INFRASTRUCTURE NOTICE: WORKFLOW CODES HAVE BEEN TEMPORARILY HALTED**
+
+### ** Workflows has been temporarily stopped because the 156M parameter model footprint requires more RAM and VRAM than standard GitHub hosted runners provide. Initializing large tensor files on standard CPU nodes causes immediate memory spikes and forces a SIGTERM termination (exit code 143). Moving training workloads to external GPU infrastructure to preserve runner minutes and keep the repository pipeline clean. **
+
+
 # JARVIS
 ## An Auditable Research Loop for Error-Driven Continual Learning in Small From-Scratch Language Models
 
