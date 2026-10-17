@@ -134,7 +134,6 @@ jobs:
 
             LOG="artifacts/autonomous_logs/cycle_${CYCLE}.log"
 
-            timeout --signal=TERM --kill-after=30s 205m \
               python main.py autonomous --cycles 1 \
               2>&1 \
               | tee "${LOG}"
