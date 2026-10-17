@@ -13,28 +13,32 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: |
-            checkpoints/
-            workspace/
-            data/
+            data
+            checkpoints
+            generations
+            workspace
           key: jarvis-continuous-main-129
 
-      - name: Prune System Bloat & Verify Footprint
+      - name: Verify Footprint & Folder Structure
         run: |
           echo "=== Freeing up runner workspace space ==="
           rm -rf ~/.cache/pip || true
           
-          echo "=== Verifying retrieved files ==="
-          ls -lh checkpoints/ || echo "No checkpoints directory found"
-          ls -lh workspace/ || echo "No workspace directory found"
+          echo "=== Verifying retrieved folders ==="
+          ls -d data checkpoints generations workspace || echo "One or more core directories are still missing"
+          
+          echo "=== Listing checkpoints ==="
+          ls -lh checkpoints/ || echo "No checkpoints found inside directory"
 
       - name: Package Into Single Zip File
         run: |
           echo "=== Compressing data structures ==="
-          zip -1 -r jarvis_latest_7GB_model_backup.zip checkpoints/ workspace/ data/
+          # Zip the exact directories mapping the cache path definitions
+          zip -1 -r jarvis_latest_7GB_model_backup.zip data checkpoints generations workspace
 
       - name: Generate Web Download Link
         uses: actions/upload-artifact@v4
         with:
           name: Full-Latest-Model-7GB-Zip
           path: jarvis_latest_7GB_model_backup.zip
-          retention-days: 90 # Keeps the download link active on your screen for 3 whole months!
+          retention-days: 90
