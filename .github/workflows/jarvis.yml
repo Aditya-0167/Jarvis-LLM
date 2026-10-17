@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
 
   # Continuous operation:
-  # one bounded research run every 30 minutes.
+  # one bounded research run every 2 hours.
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 */2 * * *"
 
 concurrency:
   # Unique to this workflow + branch.
@@ -21,7 +21,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 325
 
     steps:
 
@@ -134,7 +134,7 @@ jobs:
 
             LOG="artifacts/autonomous_logs/cycle_${CYCLE}.log"
 
-            timeout --signal=TERM --kill-after=30s 20m \
+            timeout --signal=TERM --kill-after=30s 205m \
               python main.py autonomous --cycles 1 \
               2>&1 \
               | tee "${LOG}"
