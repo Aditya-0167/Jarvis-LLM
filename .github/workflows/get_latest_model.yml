@@ -1,0 +1,40 @@
+name: Generate 7GB Model Backup Link
+on:
+  workflow_dispatch:
+
+jobs:
+  package-backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Fetch 7.63GB Cache State
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            checkpoints/
+            workspace/
+            data/
+          key: jarvis-continuous-main-129
+
+      - name: Prune System Bloat & Verify Footprint
+        run: |
+          echo "=== Freeing up runner workspace space ==="
+          rm -rf ~/.cache/pip || true
+          
+          echo "=== Verifying retrieved files ==="
+          ls -lh checkpoints/ || echo "No checkpoints directory found"
+          ls -lh workspace/ || echo "No workspace directory found"
+
+      - name: Package Into Single Zip File
+        run: |
+          echo "=== Compressing data structures ==="
+          zip -1 -r jarvis_latest_7GB_model_backup.zip checkpoints/ workspace/ data/
+
+      - name: Generate Web Download Link
+        uses: actions/upload-artifact@v4
+        with:
+          name: Full-Latest-Model-7GB-Zip
+          path: jarvis_latest_7GB_model_backup.zip
+          retention-days: 90 # Keeps the download link active on your screen for 3 whole months!
