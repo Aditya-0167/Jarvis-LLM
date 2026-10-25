@@ -2,6 +2,15 @@
 
 ### Workflows has been temporarily stopped because the 156M parameter model footprint requires more RAM and VRAM than standard GitHub hosted runners provide. Initializing large tensor files on standard CPU nodes causes immediate memory spikes and forces a SIGTERM termination (exit code 143). **Additionally, saving successive large model checkpoints runs out of room, filling up and exhausting GitHub's strict 10 GB repository cache storage ceiling which risks automatically deleting historical progress.** Moving training workloads to external GPU infrastructure to preserve runner minutes and keep the repository pipeline clean. 
 
+----
+
+## Copyright ©2026 Aditya. All rights reserved.
+
+No permission is granted to copy, modify, distribute, reproduce, or commercially use this code or substantial portions of this repository without prior written permission. For full terms, conditions, and restrictions, please read the official License file
+| [View License](License) |
+| :--- |
+
+----
 
 # JARVIS
 ## An Auditable Research Loop for Error-Driven Continual Learning in Small From-Scratch Language Models
@@ -14,7 +23,7 @@
 
 This README is the engineering-facing companion to the JARVIS research program and ARRSI 2026 submission. It records the architecture, observed Generation-10 baseline, experimental history, recovery incidents, commands and code used during the Colab work, GitHub release workflow, GitHub Actions behavior, and the proposed V7 research protocol.
 
----
+----
 
 # Research integrity / claim status
 
