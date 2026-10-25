@@ -7,7 +7,7 @@
 ## Copyright ©2026 Aditya. All rights reserved.
 
 No permission is granted to copy, modify, distribute, reproduce, or commercially use this code or substantial portions of this repository without prior written permission. For full terms, conditions, and restrictions, please read the official License file
-| [View License](LICENSE) |
+| [View License](LICENSE.md) |
 | :--- |
 
 ----
