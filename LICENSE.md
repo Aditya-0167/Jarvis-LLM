@@ -3,7 +3,7 @@
 ## © 2026 Aditya. All rights reserved.
 
 ### No permission is granted to copy, modify, distribute, reproduce, or commercially use this code or substantial portions of this repository without prior written permission.
-
+----
 **JARVIS-LLM source code, original research materials, and other project content are protected by applicable intellectual-property laws, subject to any rights belonging to third parties and any license or permission expressly applicable to particular materials.**
 
 **Unless expressly authorized in writing by the copyright holder, or otherwise permitted by applicable law or an applicable license, no permission is granted to:**
