@@ -7,16 +7,11 @@
 **JARVIS-LLM source code, original research materials, and other project content are protected by applicable intellectual-property laws, subject to any rights belonging to third parties and any license or permission expressly applicable to particular materials.**
 
 **Unless expressly authorized in writing by the copyright holder, or otherwise permitted by applicable law or an applicable license, no permission is granted to:**
-
-**- Copy or reproduce the project's code or substantial portions of its materials.**
-
-**- Modify, adapt, or create derivative works from the project's code or protected materials.**
-
-**- Redistribute, republish, sublicense, or commercially exploit the project's code or substantial portions of its materials.**
-
-**- Present the project's original code or materials as one's own.**
-
-**- Remove or obscure applicable copyright or attribution notices.**
+- Copy or reproduce the project's code or substantial portions of its materials.
+- Modify, adapt, or create derivative works from the project's code or protected materials.
+- Redistribute, republish, sublicense, or commercially exploit the project's code or substantial portions of its materials.
+- Present the project's original code or materials as one's own.
+- Remove or obscure applicable copyright or attribution notices.
 
 ----
 
