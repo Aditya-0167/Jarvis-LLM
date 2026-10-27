@@ -15,6 +15,8 @@ No permission is granted to copy, modify, distribute, reproduce, or commercially
 # JARVIS
 ## An Auditable Research Loop for Error-Driven Continual Learning in Small From-Scratch Language Models
 
+## It evolves its own architecture, it picks its own next step, tries changes to its own design: adds layers and experts, trains the child (wider context) with only one command!
+
 **Author:** Aditya Bhatia  
 **Project type:** Independent AI research  
 **Research themes:** continual learning, recursive self-improvement, autonomous research systems, retrieval, evaluation, reproducibility, resource-aware architecture evolution
